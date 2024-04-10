@@ -4,9 +4,11 @@ import { LogRepositoryImpl } from "../infraestructure/repositories/log.repositor
 import { CronService } from "./cron/cron-service";
 import { FileSystemDatasource } from "../infraestructure/datasources/file-system.datasource";
 import { SendEmailLogs } from '../domain/use-cases/email/send-logs-email';
+import { MongoLogDatasource } from '../infraestructure/datasources/mongo-log.datasource';
 
-const fileSystemLogRepository = new LogRepositoryImpl(
-    new FileSystemDatasource(),
+const LogRepository = new LogRepositoryImpl(
+    // new FileSystemDatasource(),
+    new MongoLogDatasource()
 )
 const emailService = new EmailService();
 
@@ -14,17 +16,17 @@ export class Server{
     static start(){
         console.log("Server started...");
 
-        // CronService.CreateJob(
-        //     '*/5 * * * * *',
-        //     () => {
-        //         const url = 'https://google.com';
-        //         new CheckService(
-        //             fileSystemLogRepository,
-        //             () => console.log( `${url} is ok`),
-        //             ( error ) => console.log(error)
-        //         ).execute( url );
-        //     }
-        // );
+        CronService.CreateJob(
+            '*/5 * * * * *',
+            () => {
+                const url = 'https://google.com';
+                new CheckService(
+                    LogRepository,
+                    () => console.log( `${url} is ok`),
+                    ( error ) => console.log(error)
+                ).execute( url );
+            }
+        );
         // emailService.sendEmail({
         //     to: 'mauiricioro158@gmail.com>',
         //     subject: 'Logs de sistema',
