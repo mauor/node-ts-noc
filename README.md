@@ -12,3 +12,7 @@ El objetivo es cerar una serie de tares aplicando arquitectura limpia con Typesc
     MAILER_KEY_SECRET=
     PROD=
 ```
+3. Ejecutar 
+```npm i```
+4. Ejecutar
+ ```npm run dev```
