@@ -1,16 +1,46 @@
-import { PrismaClient } from "@prisma/client";
-import { LogDatasource } from "../../domain/datasources/log.datasource";
-import { LogEntity, LogSeverityLevel } from "../../domain/entities/log.entity";
+import { PrismaClient, SeverityLevel } from '@prisma/client';
+import { LogDatasource } from '../../domain/datasources/log.datasource';
+import { LogEntity, LogSeverityLevel } from '../../domain/entities/log.entity';
 
-const prismaClient = new PrismaClient()
 
-export class PostgresLogDatasource implements LogDatasource{
+const prismaClient = new PrismaClient();
 
-    saveLog(log: LogEntity): Promise<void> {
-        throw new Error("Method not implemented.");
+
+
+const severityEnum = {
+    low: SeverityLevel.LOW,
+    medium: SeverityLevel.MEDIUM,
+    high: SeverityLevel.HIGH,
+}
+
+
+export class PostgresLogDatasource implements LogDatasource {
+
+
+    async saveLog(log: LogEntity): Promise<void> {
+
+        const level = severityEnum[log.level as keyof typeof severityEnum];
+
+        const newLog = await prismaClient.logModel.create({
+            data: {
+                ...log,
+                level: level,
+            }
+        });
+
+        // console.log('Posgres saved');
     }
-    getLogs(severity: LogSeverityLevel): Promise<LogEntity[]> {
-        throw new Error("Method not implemented.");
+
+
+    async getLogs(severityLevel: LogSeverityLevel): Promise<LogEntity[]> {
+
+        const level = severityEnum[severityLevel];
+
+        const dbLogs = await prismaClient.logModel.findMany({
+            where: { level }
+        });
+
+        return dbLogs.map(LogEntity.fromObject);
     }
 
 }
