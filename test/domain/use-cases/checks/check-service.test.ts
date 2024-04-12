@@ -1,48 +1,43 @@
-import { LogEntity, LogSeverityLevel } from "../../entities/log.entity";
-import { LogRepository } from "../../repository/log.repository";
+import { LogEntity } from '../../../../src/domain/entities/log.entity';
+import {CheckService} from '../../../../src/domain/use-cases/checks/check-service';
 
-interface CheckServiceUseCase {
-    execute( url:string ): Promise<boolean>;
-}
+describe('domain/use-cases/checks/ckeck-service.ts', () => {
 
-type SuccessCallback = ( () => void ) | undefined;
-type ErrorCallback = ( ( error:string ) => void ) | undefined;
-
-export class CheckService implements CheckServiceUseCase {
-
-    constructor(
-        private readonly logRepository: LogRepository,
-        private readonly successCallback: SuccessCallback,
-        private readonly errorCallback: ErrorCallback,
-    ){}
-    
-    async execute(url:string):Promise<boolean>{
-        try{
-            const req = await fetch( url );
-            if( !req.ok){
-                throw new Error(`Error on check service ${url}`);
-            }
-            const logOptions = {
-                level: LogSeverityLevel.low,
-                message: `Service: ${url} working`,
-                origin: 'check-service.ts',
-            }
-            const log = new LogEntity( logOptions );
-            this.logRepository.saveLog( log );
-            this.successCallback && this.successCallback();
-            return true;
-        }
-        catch(error){
-            const logOptions = {
-                level: LogSeverityLevel.high,
-                message: `${url} is not ok. ${error}`,
-                origin: 'check-service.ts',
-            }
-            const logMessage = new LogEntity( logOptions );
-            this.logRepository.saveLog( logMessage );
-            this.errorCallback && this.errorCallback(`${error}`);
-            return false;
-        }
+    const mockRepository = {
+        saveLog: jest.fn(),
+        getLogs: jest.fn(),
     }
 
-}
+    const successCallback = jest.fn();
+    const errorCallback = jest.fn();
+
+    const checkService = new CheckService(
+        mockRepository,
+        successCallback,
+        errorCallback,
+    );
+
+    beforeEach( () => {
+        jest.clearAllMocks();
+    })
+
+    test('should call errorCallback when fetch returns false', async() => {
+
+        const wasOk = await checkService.execute('https://google.com/uysdhcbaud/udsh');
+
+        expect (wasOk ).toBe(false);
+        expect(errorCallback).toHaveBeenCalled();
+        expect(successCallback).not.toHaveBeenCalled();
+    })
+
+    test('should call successCallback when fetch returns true', async () => {
+
+        const wasOk = await checkService.execute('https://google.com');
+
+        expect(wasOk).toBe(true);
+        expect(successCallback).toHaveBeenCalled();
+        expect(errorCallback).not.toHaveBeenCalled();
+        expect(mockRepository.saveLog).toHaveBeenCalledWith(expect.any(LogEntity));
+    })
+
+})
