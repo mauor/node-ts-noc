@@ -61,16 +61,16 @@ export class Server{
             // ).execute(['mauiricioro158@gmail.com', 'mauorozcoo@gmail.com'])
             
 
-            CronService.CreateJob(
-                '*/5 * * * * *',
-                () => {
-                    const url = 'https://google.com';
-                    new MultipleCheckService(
-                        [fsLogRepository, mongoLogRepository, postgresLogRepository],
-                        () => console.log(`${url} is ok`),
-                        (error) => console.log(error)
-                    ).execute(url);
-                }
-            );
+            // CronService.CreateJob(
+            //     '*/5 * * * * *',
+            //     () => {
+            //         const url = 'https://google.com';
+            //         new MultipleCheckService(
+            //             [fsLogRepository, mongoLogRepository, postgresLogRepository],
+            //             () => console.log(`${url} is ok`),
+            //             (error) => console.log(error)
+            //         ).execute(url);
+            //     }
+            // );
         }
     }
