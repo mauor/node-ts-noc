@@ -5,7 +5,7 @@ import { CronService } from "./cron/cron-service";
 import { FileSystemDatasource } from "../infraestructure/datasources/file-system.datasource";
 import { SendEmailLogs } from '../domain/use-cases/email/send-logs-email';
 import { MongoLogDatasource } from '../infraestructure/datasources/mongo-log.datasource';
-import { PostgresLogDatasource } from '../infraestructure/datasources/postgres-log-datasource';
+import { PostgresLogDatasource } from '../infraestructure/datasources/postgres-log.datasource';
 import { MultipleCheckService } from '../domain/use-cases/checks/multiple-check-services';
 
 const fsLogRepository = new LogRepositoryImpl(
